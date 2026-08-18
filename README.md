@@ -8,8 +8,6 @@ Experiments are provided for three chest X-ray datasets:
 - MIMIC-CXR (`mimic-cxr/`)
 - JMID (`jmid/`, Japanese reports)
 
-The accompanying manuscript is available in [`PRICAI_26.pdf`](PRICAI_26.pdf).
-
 ## Setup
 
 Python 3.10+ and a CUDA-enabled GPU are recommended.
