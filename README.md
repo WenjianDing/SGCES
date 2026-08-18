@@ -1,0 +1,13 @@
+0. prepare_mimic_test.py选取3000个样本
+1. 使用generate_structure_findings.py生成结构化信息
+2. 使用extract_findings_structure_feature.py, extract_img_feature.py, extract_text_feature.py抽取向量表征
+3. 使用select_top3_jaccard_counterfactual_dual.py选择3个最相似的样本
+4. 使用method中的方法运行baseline
+5. 使用method中的方法运行our method
+6. 使用evaluation_bleu.py和evaluation_entity.py验证结果
+（select_top3_bm25/select_top3_medcpt等为别的RAG的结果）
+如果希望一次评估所有的文件可以执行最外层的evaluation_XXX_batch.py
+
+select_top3_ablation为选择ablation1的数据
+select_top3_jaccard_nocounterfactual为选择ablation2的数据
+ablation的数据调整select_top3_jaccard_counterfactual_dual中的alpha,beta,gemma即可。
