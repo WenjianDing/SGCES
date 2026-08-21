@@ -5,7 +5,18 @@ import textwrap
 import torch
 from PIL import Image
 from tqdm import tqdm
-from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
+import numpy as np
+import random
+from transformers import Qwen3VLForConditionalGeneration, AutoProcessor, set_seed
+#we use seed = 42/43/44
+seed = 44
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+set_seed(seed)
+
+
 model_path = '/root/autodl-tmp/Qwen3-VL-8B-Instruct'
 model = Qwen3VLForConditionalGeneration.from_pretrained(
     model_path, dtype="auto", device_map="auto"
@@ -15,7 +26,7 @@ model = model.to('cuda')
 
 test_data_path = "/root/autodl-tmp/ct_project/mimic_test_data.json"
 example_data_path = "/root/autodl-tmp/ct_project/mimic_ct_few_shot_examples.json"
-save_data_path = "/root/autodl-tmp/ct_project/mimic_qwen3vl8b_baseline.json"
+save_data_path = "/root/autodl-tmp/ct_project/mimic_qwen3vl8b_baseline_r3.json"
 
 with open(test_data_path, 'r') as f1:
     test_data = json.load(f1)
@@ -87,7 +98,7 @@ Impression:
         inputs = inputs.to(model.device)
 
         # Inference: Generation of the output
-        generated_ids = model.generate(**inputs, max_new_tokens=128)
+        generated_ids = model.generate(**inputs, max_new_tokens=128, do_sample=True, temperature=0.5, top_p=0.95)
         generated_ids_trimmed = [
             out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
         ]

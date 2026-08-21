@@ -4,8 +4,23 @@ import json
 import textwrap
 import torch
 from PIL import Image
+import numpy as np
+import random
 from tqdm import tqdm
-from transformers import pipeline
+from transformers import pipeline, set_seed
+#we use seed = 42/43/44
+seed = 44
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+set_seed(seed)
+generation_kwargs = {
+    "max_new_tokens": 128,
+    "do_sample": True,
+    "temperature": 0.5,
+    "top_p": 0.95,
+}
 model_path = '/root/autodl-tmp/medgemma-4b-it'
 pipe = pipeline(
     "image-text-to-text",
@@ -20,7 +35,7 @@ example_mapping_path = "/root/autodl-tmp/ct_project/mimic_sim_mapping_top3_symbo
 # 新增：反事实编辑后的结构化特征字典路径
 example_edited_struct_path = "/root/autodl-tmp/ct_project/mimic_dual_counterfactual_top3_442.json"
 
-save_data_path = "/root/autodl-tmp/ct_project/mimic_medgemma_ours_results.json"
+save_data_path = "/root/autodl-tmp/ct_project/mimic_medgemma_ours_r3.json"
 image_dir = '/root/autodl-tmp/ct_project/mimic_test_images/'
 # with open("/root/autodl-tmp/ct_project/gt_findings_structure_gpt54_dict.json", "r") as f3:
 #     uid_to_struct = json.load(f3)
@@ -125,7 +140,10 @@ Impression:
                 ]
             }
         ]
-        output = pipe(text=messages, max_new_tokens=128, max_length=None)
+        output = pipe(
+            text=messages,
+            generate_kwargs=generation_kwargs,
+        )
         predict_result = output[0]["generated_text"][-1]["content"]
         # print('prompt')
         # print(prompt)

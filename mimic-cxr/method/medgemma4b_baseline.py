@@ -4,9 +4,25 @@ import json
 import textwrap
 import requests
 import torch
+import numpy as np
+import random
 from PIL import Image
 from tqdm import tqdm
-from transformers import pipeline
+from transformers import pipeline, set_seed
+#we use seed = 42/43/44
+seed = 44
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+set_seed(seed)
+
+generation_kwargs = {
+    "max_new_tokens": 128,
+    "do_sample": True,
+    "temperature": 0.5,
+    "top_p": 0.95,
+}
 model_path = '/root/autodl-tmp/medgemma-4b-it'
 pipe = pipeline(
     "image-text-to-text",
@@ -18,7 +34,7 @@ pipe = pipeline(
 
 test_data_path = "/root/autodl-tmp/ct_project/mimic_test_data.json"
 example_data_path = "/root/autodl-tmp/ct_project/mimic_ct_few_shot_examples.json"
-save_data_path = "/root/autodl-tmp/ct_project/mimic_medgemma_baseline.json"
+save_data_path = "/root/autodl-tmp/ct_project/medgemma_baseline_r3.json"
 
 with open(test_data_path, 'r') as f1:
     test_data = json.load(f1)
@@ -83,7 +99,10 @@ Impression:
             }
         ]
 
-        output = pipe(text=messages, max_new_tokens=128, max_length=None)
+        output = pipe(
+            text=messages,
+            generate_kwargs=generation_kwargs,
+        )
         predict_result = output[0]["generated_text"][-1]["content"]
         # print('prompt')
         # print(prompt)

@@ -5,17 +5,25 @@ import textwrap
 import torch
 from PIL import Image
 from tqdm import tqdm
-from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
-
+import numpy as np
+import random
+from transformers import Qwen3VLForConditionalGeneration, AutoProcessor, set_seed
+#we use seed = 42/43/44
+seed = 42
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+set_seed(seed)
 # --- 配置路径 ---
 model_path = '/root/autodl-tmp/Qwen3-VL-8B-Instruct'
 test_data_path = "/root/autodl-tmp/ct_project/ct_data.json"
 # 这里的 example_data_path 是你之前保存的相似度映射字典 (Top-3 IDs)
 example_mapping_path = "/root/autodl-tmp/ct_project/final_sim_mapping_top3_symbolic_442.json"
 # 新增：反事实编辑后的结构化特征字典路径
-example_edited_struct_path = "/root/autodl-tmp/ct_project/final_baseline_raw_struct_top3.json"
+example_edited_struct_path = "/root/autodl-tmp/ct_project/final_dual_counterfactual_edited_top3_442.json"
 
-save_data_path = "/root/autodl-tmp/ct_project/qwen3vl8b_ab2_with_raw.json"
+save_data_path = "/root/autodl-tmp/ct_project/qwen3vl8b_ours_r1.json"
 image_dir = '/root/autodl-tmp/ct_project/ct_images/images_normalized/'
 # with open("/root/autodl-tmp/ct_project/gt_findings_structure_gpt54_dict.json", "r") as f3:
 #     uid_to_struct = json.load(f3)
@@ -131,7 +139,7 @@ Impression:
         ).to(model.device)
 
         # 生成结果：max_new_tokens 设置为 128 足够 Impression 使用
-        generated_ids = model.generate(**inputs, max_new_tokens=128, do_sample=False)
+        generated_ids = model.generate(**inputs, max_new_tokens=128, do_sample=True, temperature=0.5, top_p=0.95)
 
         # 裁剪掉 Prompt 部分
         generated_ids_trimmed = [
