@@ -1,6 +1,6 @@
-# Structured Counterfactual RAG for Radiology Report Generation
+# Structure-Guided RAG with Counterfactual Exemplar Synthesis for Radiology Impression Generation
 
-This repository contains the code for radiology report generation using multimodal retrieval, structured clinical findings, and bidirectional counterfactual editing.
+This repository contains the official implementation of our paper published at **PRICAI 2026**.
 
 Experiments are provided for three chest X-ray datasets:
 
